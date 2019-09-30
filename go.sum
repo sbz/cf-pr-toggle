@@ -1,0 +1,4 @@
+github.com/cloudflare/cloudflare-go v0.10.1 h1:d2CL6F9k2O0Ux0w27LgogJ5UOzZRj6a/hDPFqPP68d8=
+github.com/cloudflare/cloudflare-go v0.10.1/go.mod h1:C0Y6eWnTJPMK2ceuOxx2pjh78UUHihcXeTTHb8r7QjU=
+github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
+github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
