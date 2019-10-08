@@ -13,6 +13,45 @@ type Config struct {
 	Domain string `envconfig:"DOMAIN" default:"6dev.net"`
 }
 
+type PageRule interface {
+	Enable(cloudflare.PageRule)
+	Disable(cloudflare.PageRule)
+}
+
+type PageRuleRequest struct {
+	zoneID string
+	api    cloudflare.API
+}
+
+type PageRuleProvider struct {
+	request PageRule
+}
+
+func (p *PageRuleRequest) toggle(targetRule cloudflare.PageRule, ruleStatus string) {
+	changedRule := cloudflare.PageRule{Status: ruleStatus}
+
+	err := p.api.ChangePageRule(p.zoneID, targetRule.ID, changedRule)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func (p *PageRuleRequest) Enable(targetRule cloudflare.PageRule) {
+	p.toggle(targetRule, "active")
+}
+
+func (p *PageRuleRequest) Disable(targetRule cloudflare.PageRule) {
+	p.toggle(targetRule, "disabled")
+}
+
+func newPageRuleRequest(zoneID string, api *cloudflare.API) PageRule {
+	return &PageRuleRequest{
+		zoneID: zoneID,
+		api:    *api,
+	}
+}
+
 func main() {
 
 	var config Config
@@ -38,21 +77,18 @@ func main() {
 
 	fmt.Println(len(pageRules))
 
-	for _, r := range pageRules {
-		var newRule cloudflare.PageRule
-		if r.Status == "disabled" {
+	request := newPageRuleRequest(zoneID, api)
+	provider := PageRuleProvider{request: request}
+
+	for _, rule := range pageRules {
+		if rule.Status == "disabled" {
 			log.Printf("Found page rule disabled, will active.\n")
-			newRule = cloudflare.PageRule{Status: "active"}
+			provider.request.Enable(rule)
 		} else {
 			log.Printf("Found page rule active, will disable.\n")
-			newRule = cloudflare.PageRule{Status: "disabled"}
+			provider.request.Disable(rule)
 		}
-		err := api.ChangePageRule(zoneID, r.ID, newRule)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("NewRule: %+v\n", newRule)
-		pageRule, _ := api.ListPageRules(zoneID)
-		fmt.Printf("Current Rule: %v\n", pageRule[0])
+
+		fmt.Printf("Current Rule: %+v\n", rule)
 	}
 }
