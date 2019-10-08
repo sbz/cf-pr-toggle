@@ -7,13 +7,10 @@ import (
 	"log"
 )
 
-const (
-	domain = "6dev.net"
-)
-
 type Config struct {
 	ApiKey string `envconfig:"TOKEN" required:"true"`
 	Email  string `envconfig:"EMAIL" required:"true"`
+	Domain string `envconfig:"DOMAIN" default:"6dev.net"`
 }
 
 func main() {
@@ -29,7 +26,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	zoneID, err := api.ZoneIDByName(domain)
+	zoneID, err := api.ZoneIDByName(config.Domain)
 	if err != nil {
 		log.Fatal(err)
 	}
