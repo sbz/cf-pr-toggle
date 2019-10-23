@@ -1,5 +1,7 @@
 # cf-pr-toggle
 
+[![Build Status](https://api.travis-ci.org/sbz/cf-pr-toggle.svg?branch=master)](https://travis-ci.org/sbz/cf-pr-toggle)
+
 A *dead* simple tool in order to toggle my [Page Rules][1] on [Cloudflare][2].
 
 Toggle means either `enable` or `disable` a given rule.

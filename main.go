@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 )
 
 type Config struct {
@@ -45,7 +46,7 @@ func (p *PageRuleRequest) Disable(targetRule cloudflare.PageRule) {
 	p.toggle(targetRule, "disabled")
 }
 
-func newPageRuleRequest(zoneID string, api *cloudflare.API) PageRule {
+func newPageRuleRequest(zoneID string, api *cloudflare.API) *PageRuleRequest {
 	return &PageRuleRequest{
 		zoneID: zoneID,
 		api:    *api,
@@ -81,6 +82,7 @@ func main() {
 	provider := PageRuleProvider{request: request}
 
 	for _, rule := range pageRules {
+		fmt.Printf("Current Rule: %+v\n", rule)
 		if rule.Status == "disabled" {
 			log.Printf("Found page rule disabled, will active.\n")
 			provider.request.Enable(rule)
@@ -88,7 +90,5 @@ func main() {
 			log.Printf("Found page rule active, will disable.\n")
 			provider.request.Disable(rule)
 		}
-
-		fmt.Printf("Current Rule: %+v\n", rule)
 	}
 }
