@@ -1,17 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/cloudflare/cloudflare-go"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/sethvargo/go-envconfig"
 )
 
 type Config struct {
-	ApiKey string `envconfig:"TOKEN" required:"true"`
-	Email  string `envconfig:"EMAIL" required:"true"`
-	Domain string `envconfig:"DOMAIN" default:"6dev.net"`
+	ApiKey string `env:"TOKEN,required"`
+	Email  string `env:"EMAIL,required"`
+	Domain string `env:"DOMAIN,default=6dev.net"`
 }
 
 type PageRule interface {
@@ -56,8 +58,10 @@ func newPageRuleRequest(zoneID string, api *cloudflare.API) *PageRuleRequest {
 func main() {
 
 	var config Config
-	err := envconfig.Process("cloudflare", &config)
-	if err != nil {
+	ctx := context.Background()
+
+	prefixLookup := envconfig.PrefixLookuper("CLOUDFLARE_", envconfig.OsLookuper())
+	if err := envconfig.ProcessWith(ctx, &config, prefixLookup); err != nil {
 		log.Fatalf("Error reading config: %s\n", err)
 	}
 
@@ -91,4 +95,6 @@ func main() {
 			provider.request.Disable(rule)
 		}
 	}
+
+    os.Exit(0)
 }
