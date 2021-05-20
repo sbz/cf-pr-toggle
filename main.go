@@ -67,7 +67,6 @@ func renderRule(rule cloudflare.PageRule) string {
 	sb.WriteString(rule.Status)
 	sb.WriteString("\t\t")
 	sb.WriteString(rule.ModifiedOn.String())
-	sb.WriteString("\n")
 
 	return sb.String()
 }
@@ -108,7 +107,7 @@ func main() {
 	if len(os.Args) == 1 {
 		fmt.Printf("%-30s\t\t%-15s\t\t%-10s\t\t%-10s\n", "Rule Id", "URL", "Status", "Last Updated")
 		for _, rule := range pageRules {
-			fmt.Printf(renderRule(rule))
+			fmt.Println(renderRule(rule))
 		}
 
 		fmt.Printf("%d existing rules.\n", len(pageRules))
@@ -118,6 +117,9 @@ func main() {
 
 	ruleId := os.Args[1]
 	rule, err := api.PageRule(zoneId, ruleId)
+	if err != nil {
+		log.Fatalf("Rule Id %q not valid\n", ruleId)
+	}
 	if rule.Status == "disabled" {
 		log.Printf("Found page rule disabled, will active.\n")
 		provider.request.Enable(rule)
