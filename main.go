@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/sethvargo/go-envconfig"
@@ -55,6 +56,22 @@ func newPageRuleRequest(zoneID string, api *cloudflare.API) *PageRuleRequest {
 	}
 }
 
+func renderRule(rule cloudflare.PageRule) string {
+
+	var sb strings.Builder
+
+	sb.WriteString(rule.ID)
+	sb.WriteString("\t")
+	sb.WriteString(strings.TrimSpace(rule.Targets[0].Constraint.Value))
+	sb.WriteString("\t")
+	sb.WriteString(rule.Status)
+	sb.WriteString("\t\t")
+	sb.WriteString(rule.ModifiedOn.String())
+	sb.WriteString("\n")
+
+	return sb.String()
+}
+
 func main() {
 
 	var config Config
@@ -83,16 +100,31 @@ func main() {
 	request := newPageRuleRequest(zoneId, api)
 	provider := PageRuleProvider{request: request}
 
-	for _, rule := range pageRules {
-		fmt.Printf("Current Rule: %+v\n", rule)
-		if rule.Status == "disabled" {
-			log.Printf("Found page rule disabled, will active.\n")
-			provider.request.Enable(rule)
-		} else {
-			log.Printf("Found page rule active, will disable.\n")
-			provider.request.Disable(rule)
-		}
+	if len(os.Args) > 2 {
+		fmt.Printf("usage: %s [<ruleId>]\n", os.Args[0])
+		os.Exit(1)
 	}
 
-    os.Exit(0)
+	if len(os.Args) == 1 {
+		fmt.Printf("%-30s\t\t%-15s\t\t%-10s\t\t%-10s\n", "Rule Id", "URL", "Status", "Last Updated")
+		for _, rule := range pageRules {
+			fmt.Printf(renderRule(rule))
+		}
+
+		fmt.Printf("%d existing rules.\n", len(pageRules))
+
+		os.Exit(0)
+	}
+
+	ruleId := os.Args[1]
+	rule, err := api.PageRule(zoneId, ruleId)
+	if rule.Status == "disabled" {
+		log.Printf("Found page rule disabled, will active.\n")
+		provider.request.Enable(rule)
+	} else {
+		log.Printf("Found page rule active, will disable.\n")
+		provider.request.Disable(rule)
+	}
+
+	os.Exit(0)
 }
