@@ -70,19 +70,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	zoneID, err := api.ZoneIDByName(config.Domain)
+	zoneId, err := api.ZoneIDByName(config.Domain)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pageRules, err := api.ListPageRules(zoneID)
+	pageRules, err := api.ListPageRules(zoneId)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(len(pageRules))
-
-	request := newPageRuleRequest(zoneID, api)
+	request := newPageRuleRequest(zoneId, api)
 	provider := PageRuleProvider{request: request}
 
 	for _, rule := range pageRules {
