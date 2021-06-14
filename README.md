@@ -12,7 +12,9 @@ You need to pass the 2 following variables to authenticate against the
 Cloudflare API:
 
 ```bash
-$ CLOUDFLARE_EMAIL=<youremail> CLOUDFLARE_TOKEN=<yourtoken> ./cf-pr-toggle
+$ export CLOUDFLARE_EMAIL=<youremail> CLOUDFLARE_TOKEN=<yourtoken>
+$ ./cf-pr-toggle # list rules
+$ ./cf-pr-toggle <rule-id> # toggle rule with id <rule-id>
 ```
 
 [1]: https://www.cloudflare.com/features-page-rules
