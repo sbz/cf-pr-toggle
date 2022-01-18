@@ -59,13 +59,13 @@ func newPageRuleRequest(zoneID string, api *cloudflare.API) *PageRuleRequest {
 func renderRule(rule cloudflare.PageRule) string {
 	var sb strings.Builder
 
-	sb.WriteString(rule.ID)
+	sb.WriteString(fmt.Sprintf("%-30s", rule.ID))
 	sb.WriteString("\t")
-	sb.WriteString(strings.TrimSpace(rule.Targets[0].Constraint.Value))
+	sb.WriteString(fmt.Sprintf("%-20s",strings.TrimSpace(rule.Targets[0].Constraint.Value)))
 	sb.WriteString("\t")
-	sb.WriteString(rule.Status)
-	sb.WriteString("\t\t")
-	sb.WriteString(rule.ModifiedOn.String())
+	sb.WriteString(fmt.Sprintf("%-20s", rule.Status))
+	sb.WriteString("\t")
+	sb.WriteString(fmt.Sprintf("%-15s", rule.ModifiedOn.String()))
 
 	return sb.String()
 }
@@ -103,7 +103,7 @@ func main() {
 	}
 
 	if len(os.Args) == 1 {
-		fmt.Printf("%-30s\t\t%-15s\t\t%-10s\t\t%-10s\n", "Rule Id", "URL", "Status", "Last Updated")
+		fmt.Printf("%-30s\t\t%-20s\t%-20s\t%-15s\n", "Rule Id", "URL", "Status", "Last Updated")
 
 		for _, rule := range pageRules {
 			fmt.Println(renderRule(rule))

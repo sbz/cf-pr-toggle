@@ -6,6 +6,18 @@ A *dead* simple tool in order to toggle my [Page Rules][1] on [Cloudflare][2].
 
 Toggle means either `enable` or `disable` a given rule.
 
+# Building
+
+```bash
+go build
+```
+
+# Testing
+
+```bash
+go test -v
+```
+
 # Usage
 
 You need to pass the 2 following variables to authenticate against the
@@ -13,7 +25,7 @@ Cloudflare API:
 
 ```bash
 $ export CLOUDFLARE_EMAIL=<youremail> CLOUDFLARE_TOKEN=<yourtoken>
-$ ./cf-pr-toggle # list rules
+$ ./cf-pr-toggle # list existing rules
 $ ./cf-pr-toggle <rule-id> # toggle rule with id <rule-id>
 ```
 
