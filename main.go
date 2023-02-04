@@ -34,7 +34,7 @@ type PageRuleProvider struct {
 func (p *PageRuleRequest) toggle(targetRule cloudflare.PageRule, ruleStatus string) {
 	changedRule := cloudflare.PageRule{Status: ruleStatus}
 
-	err := p.api.ChangePageRule(p.zoneID, targetRule.ID, changedRule)
+	err := p.api.ChangePageRule(context.Background(), p.zoneID, targetRule.ID, changedRule)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func renderRule(rule cloudflare.PageRule) string {
 
 	sb.WriteString(fmt.Sprintf("%-30s", rule.ID))
 	sb.WriteString("\t")
-	sb.WriteString(fmt.Sprintf("%-20s",strings.TrimSpace(rule.Targets[0].Constraint.Value)))
+	sb.WriteString(fmt.Sprintf("%-20s", strings.TrimSpace(rule.Targets[0].Constraint.Value)))
 	sb.WriteString("\t")
 	sb.WriteString(fmt.Sprintf("%-20s", rule.Status))
 	sb.WriteString("\t")
@@ -89,7 +89,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pageRules, err := api.ListPageRules(zoneId)
+	pageRules, err := api.ListPageRules(context.Background(), zoneId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -115,7 +115,7 @@ func main() {
 	}
 
 	ruleId := os.Args[1]
-	rule, err := api.PageRule(zoneId, ruleId)
+	rule, err := api.PageRule(context.Background(), zoneId, ruleId)
 
 	if err != nil {
 		log.Fatalf("Rule Id %q not valid\n", ruleId)
